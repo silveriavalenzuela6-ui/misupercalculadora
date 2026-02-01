@@ -1,39 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><link rel="manifest" href="manifest.json">
-    <meta charset="UTF-8">
-    <title>Mi Calculadora</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="calculadora">
-        <input type="text" id="pantalla" disabled>
-        <div class="botones">
-            <button onclick="limpiar()" class="btn-rojo">C</button>
-            <button onclick="agregar('/')">/</button>
-            <button onclick="agregar('*')">x</button>
-            <button onclick="borrarUno()">←</button>
-            <button onclick="juegoAdivinar()">Juego</button>
-            
-            <button onclick="agregar('7')">7</button>
-            <button onclick="agregar('8')">8</button>
-            <button onclick="agregar('9')">9</button>
-            <button onclick="agregar('-')">-</button>
-            
-            <button onclick="agregar('4')">4</button>
-            <button onclick="agregar('5')">5</button>
-            <button onclick="agregar('6')">6</button>
-            <button onclick="agregar('+')">+</button>
-            
-            <button onclick="agregar('1')">1</button>
-            <button onclick="agregar('2')">2</button>
-            <button onclick="agregar('3')">3</button>
-            <button onclick="calcular()" class="btn-igual">=</button>
-            
-            <button onclick="agregar('0')" class="cero">0</button>
-            <button onclick="agregar('.')">.</button>
-        </div>
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>
+document.addEventListener('DOMContentLoaded', mostrarTareas);
+
+function agregar() {
+    let input = document.getElementById("tarea");
+    let nuevaTarea = input.value;
+    if (nuevaTarea !== "") {
+        guardarTareaLocal(nuevaTarea);
+        crearElementoLista(nuevaTarea);
+        input.value = ""; 
+    }
+}
+
+function crearElementoLista(texto) {
+    let li = document.createElement("li");
+    li.innerHTML = `
+        ${texto} 
+        <button onclick="borrarTarea(this)" style="background:#ff4d4d; padding:2px 8px; font-size:12px;">X</button>
+    `;
+    document.getElementById("lista").appendChild(li);
+}
+
+function borrarTarea(elemento) {
+    // Eliminar de la pantalla
+    let li = elemento.parentElement;
+    let textoTarea = li.firstChild.textContent.trim();
+    li.remove();
+
+    // Eliminar de la memoria (LocalStorage)
+    let tareas = JSON.parse(localStorage.getItem("tareas"));
+    let nuevasTareas = tareas.filter(t => t !== textoTarea);
+    localStorage.setItem("tareas", JSON.stringify(nuevasTareas));
+}
+
+function guardarTareaLocal(tarea) {
+    let tareas = localStorage.getItem("tareas") ? JSON.parse(localStorage.getItem("tareas")) : [];
+    tareas.push(tarea);
+    localStorage.setItem("tareas", JSON.stringify(tareas));
+}
+
+function mostrarTareas() {
+    let tareas = localStorage.getItem("tareas") ? JSON.parse(localStorage.getItem("tareas")) : [];
+    tareas.forEach(tarea => crearElementoLista(tarea));
+}
